@@ -1,46 +1,9 @@
 ## DZMPythonBaseProject
 
-* 自用 `Python` 基础工程，`Python 3.3+` 版本使用。
+* [venv 虚拟环境使用文档](https://blog.csdn.net/zz00008888/article/details/155735792)
 
-## 虚拟环境
+* 快速安装依赖环境
 
-* 创建虚拟环境
+  * `mac` 执行 `source install.sh`
 
-  ```sh
-  $ python -m venv venv
-  ```
-
-* 运行虚拟环境
-
-  ```sh
-  # mac
-  $ source venv/bin/activate
-
-  # windows
-  $ venv\Scripts\activate
-  ```
-
-* 导出虚拟环境依赖
-
-  ```sh
-  $ pip freeze > requirements.txt
-  ```
-
-* 退出虚拟环境
-
-  ```sh
-  $ deactivate
-  ```
-
-* 其他机器运行项目
-
-  ```sh
-  # 创建虚拟环境
-  $ python -m venv venv
-
-  # 运行虚拟环境（根据系统使用不同命令）
-  $ source venv/bin/activate
-  
-  # 恢复虚拟环境
-  $ pip install -r requirements.txt
-  ```
+  * `windows` 双击或执行 `install.bat`
