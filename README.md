@@ -16,4 +16,6 @@
   
     不要使用 `PowerShell`，`install.sh` 不支持 `PowerShell`
 
+  * 生成依赖清单 `$ pip freeze > requirements.txt`
+
   * 退出虚拟环境 `$ deactivate`
