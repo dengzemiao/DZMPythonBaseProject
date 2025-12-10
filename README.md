@@ -7,3 +7,5 @@
   * `mac/linux` 执行 `source install.sh`
 
   * `windows` 使用 `Git Bash` 执行 `source install.sh` 或 `./install.sh`
+
+  * 退出虚拟环境 `$ deactivate`

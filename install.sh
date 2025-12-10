@@ -53,7 +53,18 @@ fi
 
 # 激活虚拟环境
 printf "${BLUE}· 激活虚拟环境...${NC}\n"
-source venv/bin/activate
+# 检测操作系统类型，Windows 使用 Scripts/activate，macOS/Linux 使用 bin/activate
+if [ -f "venv/Scripts/activate" ]; then
+    # Windows (Git Bash)
+    source venv/Scripts/activate
+elif [ -f "venv/bin/activate" ]; then
+    # macOS / Linux
+    source venv/bin/activate
+else
+    printf "${RED}✗ 错误: 找不到虚拟环境激活脚本${NC}\n"
+    printf "${YELLOW}· 虚拟环境可能未正确创建${NC}\n"
+    exit 1
+fi
 
 # 升级 pip
 printf "${BLUE}· 升级虚拟环境 pip...${NC}\n"
