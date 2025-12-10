@@ -57,6 +57,9 @@ printf "${BLUE}· 激活虚拟环境...${NC}\n"
 if [ -f "venv/Scripts/activate" ]; then
     # Windows (Git Bash)
     source venv/Scripts/activate
+    # Windows 环境下设置 UTF-8 编码，避免 pip 读取 requirements.txt 时出现编码错误
+    export PYTHONIOENCODING=utf-8
+    export PYTHONUTF8=1
 elif [ -f "venv/bin/activate" ]; then
     # macOS / Linux
     source venv/bin/activate
@@ -66,7 +69,7 @@ else
     exit 1
 fi
 
-# 升级 pip
+# 升级 pip（在 Windows 上需要 UTF-8 编码支持）
 printf "${BLUE}· 升级虚拟环境 pip...${NC}\n"
 pip install --upgrade pip
 if [ $? -ne 0 ]; then
