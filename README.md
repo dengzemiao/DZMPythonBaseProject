@@ -4,6 +4,6 @@
 
 * 快速安装依赖环境
 
-  * `mac` 执行 `source install.sh`
+  * `mac/linux` 执行 `source install.sh`
 
-  * `windows` 双击或执行 `install.bat`
+  * `windows` 使用 `Git Bash` 执行 `source install.sh` 或 `./install.sh`

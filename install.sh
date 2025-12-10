@@ -3,7 +3,7 @@
 # ========================================
 # 项目依赖安装脚本
 # 
-# 适用系统：macOS / Linux / Unix 系统
+# 适用系统：macOS / Linux / Unix / Windows (Git Bash)
 # 
 # 使用方法：
 #   ./install.sh              # 直接执行
@@ -12,7 +12,7 @@
 #   或
 #   . install.sh               # 同上，更简洁的写法
 # 
-# Windows 用户请使用: install.bat
+# Windows 用户：可以使用 Git Bash 运行此脚本
 # ========================================
 
 # 颜色定义
@@ -58,11 +58,22 @@ source venv/bin/activate
 # 升级 pip
 printf "${BLUE}· 升级虚拟环境 pip...${NC}\n"
 pip install --upgrade pip
+if [ $? -ne 0 ]; then
+    printf "${RED}✗ 错误: 升级 pip 失败${NC}\n"
+    printf "${YELLOW}· 请检查网络连接或 pip 配置${NC}\n"
+    exit 1
+fi
+printf "${GREEN}✓ pip 升级完成${NC}\n"
 
 # 安装依赖
 printf "\n"
 printf "${BLUE}· 安装虚拟环境依赖包...${NC}\n"
 pip install -r requirements.txt
+if [ $? -ne 0 ]; then
+    printf "${RED}✗ 错误: 安装依赖包失败${NC}\n"
+    printf "${YELLOW}· 请检查 requirements.txt 文件是否存在或网络连接是否正常${NC}\n"
+    exit 1
+fi
 
 printf "\n"
 printf "${GREEN}✓ 安装完成！${NC}\n"
