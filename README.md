@@ -10,9 +10,9 @@
 
 * 快速安装依赖环境，并使用虚拟环境
 
-  * 初始化环境并进入虚拟环境 `mac/linux` 执行 `$ source install.sh`
+  * 初始化环境、安装依赖、进入虚拟环境：`mac/linux` 执行 `$ source install.sh`
 
-  * 初始化环境并进入虚拟环境 `windows` 使用 `Git Bash` 执行 `$ source install.sh`
+  * 初始化环境、安装依赖、进入虚拟环境：`windows` 使用 `Git Bash` 执行 `$ source install.sh`
   
     不要使用 `PowerShell`，`install.sh` 不支持 `PowerShell`
 
