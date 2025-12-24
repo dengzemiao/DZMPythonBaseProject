@@ -10,12 +10,18 @@
 
 * 快速安装依赖环境，并使用虚拟环境
 
-  * `mac/linux` 执行 `source install.sh`
+  * 安装并进入虚拟环境：`mac/linux` 执行 `$ source install.sh`
 
-  * `windows` 使用 `Git Bash` 执行 `source install.sh`
+  * 安装并进入虚拟环境 `windows` 使用 `Git Bash` 执行 `$ source install.sh`
   
     不要使用 `PowerShell`，`install.sh` 不支持 `PowerShell`
 
-  * 生成依赖清单 `$ pip freeze > requirements.txt`
+  * 手动进入虚拟环境：
 
-  * 退出虚拟环境 `$ deactivate`
+      `Mac/Liunx`: `$ source venv/Scripts/activate`
+
+      `Winodws`: `$ source venv/bin/activate`
+
+  * 手动生成依赖清单 `$ pip freeze > requirements.txt`
+
+  * 手动退出虚拟环境 `$ deactivate`
