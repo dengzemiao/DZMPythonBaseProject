@@ -6,18 +6,18 @@
 # 功能说明：
 #   1. 检查 Python 3 环境是否已安装
 #   2. 创建或使用现有的 Python 虚拟环境
-#   3. 激活虚拟环境
+#   3. 智能激活虚拟环境（避免重复激活）
 #   4. 升级 pip 到最新版本
 #   5. 安装 requirements.txt 中列出的所有依赖包
 # 
 # 适用系统：macOS / Linux / Unix / Windows (Git Bash)
 # 
 # 使用方法：
-#   ./install.sh              # 直接执行（推荐）
+#   ./rinstall.sh          # 直接执行（推荐）
 #   或
-#   source install.sh          # 执行后虚拟环境会在当前 shell 中保持激活
+#   source rinstall.sh     # 执行后虚拟环境会在当前 shell 中保持激活
 #   或
-#   . install.sh               # 同上，更简洁的写法
+#   . rinstall.sh          # 同上，更简洁的写法
 # 
 # Windows 用户：可以使用 Git Bash 运行此脚本
 # ========================================
@@ -26,12 +26,49 @@
 # 颜色定义（ANSI 转义码）
 # ========================================
 # 用于在终端中输出彩色文本，提升用户体验
-# \033[0;32m 表示绿色，\033[0m 表示重置颜色
 GREEN='\033[0;32m'      # 绿色：用于成功信息
 YELLOW='\033[1;33m'     # 黄色：用于警告或提示信息
 BLUE='\033[0;34m'       # 蓝色：用于普通进度信息
 RED='\033[0;31m'        # 红色：用于错误信息
 NC='\033[0m'            # No Color：重置颜色，恢复终端默认颜色
+
+# ========================================
+# 全局变量
+# ========================================
+# 获取当前脚本所在目录的绝对路径
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV_PATH="${SCRIPT_DIR}/venv"
+IS_WINDOWS=0  # Windows 标识变量（0 表示非 Windows，1 表示 Windows）
+
+# ========================================
+# 函数：激活虚拟环境
+# ========================================
+activate_venv() {
+    # 检测操作系统类型并激活虚拟环境
+    # Windows 系统：虚拟环境的激活脚本位于 venv/Scripts/activate
+    # macOS/Linux 系统：虚拟环境的激活脚本位于 venv/bin/activate
+    
+    if [ -f "venv/Scripts/activate" ]; then
+        # Windows 系统 (Git Bash)
+        # source: 在当前 shell 中执行脚本（而不是创建子 shell）
+        source venv/Scripts/activate
+        IS_WINDOWS=1
+        
+        # Windows 环境下设置 UTF-8 编码环境变量
+        # 原因：Windows 默认使用 GBK 编码，pip 读取包含中文的 requirements.txt 时会报编码错误
+        export PYTHONIOENCODING=utf-8
+        export PYTHONUTF8=1
+        
+    elif [ -f "venv/bin/activate" ]; then
+        # macOS / Linux 系统
+        source venv/bin/activate
+    else
+        # 两个激活脚本都不存在，说明虚拟环境创建异常
+        printf "${RED}✗ 错误: 找不到虚拟环境激活脚本${NC}\n"
+        printf "${YELLOW}· 虚拟环境可能未正确创建${NC}\n"
+        exit 1
+    fi
+}
 
 # ========================================
 # 步骤 1: 检查 Python 环境是否安装
@@ -90,43 +127,34 @@ else
 fi
 
 # ========================================
-# 步骤 4: 激活虚拟环境
+# 步骤 4: 智能检测并激活虚拟环境
 # ========================================
-printf "${BLUE}· 激活虚拟环境...${NC}\n"
+# VIRTUAL_ENV 是虚拟环境激活后自动设置的环境变量
+# 通过检查这个变量，可以知道是否已经在虚拟环境中
 
-# 初始化 Windows 标识变量（0 表示非 Windows，1 表示 Windows）
-IS_WINDOWS=0
-
-# 检测操作系统类型
-# Windows 系统：虚拟环境的激活脚本位于 venv/Scripts/activate
-# macOS/Linux 系统：虚拟环境的激活脚本位于 venv/bin/activate
-# [ -f "path" ]: 检查文件是否存在且为普通文件
-
-if [ -f "venv/Scripts/activate" ]; then
-    # Windows 系统 (Git Bash)
-    # source: 在当前 shell 中执行脚本（而不是创建子 shell）
-    # 这样可以确保虚拟环境变量在当前 shell 中生效
-    source venv/Scripts/activate
-    
-    # 设置 Windows 标识
-    IS_WINDOWS=1
-    
-    # Windows 环境下设置 UTF-8 编码环境变量
-    # 原因：Windows 默认使用 GBK 编码，pip 读取包含中文的 requirements.txt 时会报编码错误
-    # PYTHONIOENCODING=utf-8: 强制 Python 使用 UTF-8 编码处理输入输出
-    # PYTHONUTF8=1: 启用 Python 的 UTF-8 模式（Python 3.7+）
-    export PYTHONIOENCODING=utf-8
-    export PYTHONUTF8=1
-    
-elif [ -f "venv/bin/activate" ]; then
-    # macOS / Linux 系统
-    # 在 Unix 系统中，激活脚本位于 bin 目录
-    source venv/bin/activate
+if [ -n "$VIRTUAL_ENV" ]; then
+    # 已经在虚拟环境中，检查是否是当前项目的虚拟环境
+    if [ "$VIRTUAL_ENV" = "$VENV_PATH" ] || [ "$VIRTUAL_ENV" = "$(cd "$VENV_PATH" 2>/dev/null && pwd)" ]; then
+        # 当前项目的虚拟环境已激活，跳过激活步骤
+        printf "${GREEN}✓ 虚拟环境已激活（当前项目）${NC}\n"
+        
+        # 检测操作系统类型（用于后续选择 pip 命令）
+        if [ -f "venv/Scripts/activate" ]; then
+            IS_WINDOWS=1
+            # Windows 环境下确保设置 UTF-8 编码
+            export PYTHONIOENCODING=utf-8
+            export PYTHONUTF8=1
+        fi
+    else
+        # 激活的是其他项目的虚拟环境，提示并切换
+        printf "${YELLOW}⚠ 检测到已激活其他虚拟环境${NC}\n"
+        printf "${YELLOW}· 切换到当前项目的虚拟环境...${NC}\n"
+        activate_venv
+    fi
 else
-    # 两个激活脚本都不存在，说明虚拟环境创建异常
-    printf "${RED}✗ 错误: 找不到虚拟环境激活脚本${NC}\n"
-    printf "${YELLOW}· 虚拟环境可能未正确创建${NC}\n"
-    exit 1
+    # 未激活任何虚拟环境，执行激活
+    printf "${BLUE}· 激活虚拟环境...${NC}\n"
+    activate_venv
 fi
 
 # ========================================
@@ -191,4 +219,4 @@ printf "${GREEN}✓ 安装完成！${NC}\n"
 
 # 脚本执行完毕
 # 如果使用 source 或 . 命令执行脚本，虚拟环境会在当前 shell 中保持激活状态
-# 如果使用 ./install.sh 执行，虚拟环境会在脚本结束后自动退出
+# 如果使用 ./rinstall.sh 执行，虚拟环境会在脚本结束后自动退出
