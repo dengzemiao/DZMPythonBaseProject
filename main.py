@@ -188,7 +188,6 @@ if __name__ == "__main__":
     -H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8' \
     -H 'Connection: keep-alive' \
     -H 'Content-Type: application/json' \
-    -H 'Cookie: ptcz=7323a244ef82664032b403412544c93c6a154f03d3b01a6ec06ba67156cec1a2; pgv_pvid=4710672768; RK=sUNZ/g8acV; eas_sid=r177N582C7d4p3A072h8Y5i9A1; markHashId_L=d6b6bdcf-be56-4443-89c2-cb696a622b0c; qm_authimgs_id=1; qm_verifyimagesession=h01a2259b17e20e46ef49621e9c1546bc9573ac5a9307c8071f5e26ef97eb42ce4b67006e443459d334; _clck=x5jptm|1|g23|0; sessionid=BgAAcJxoV%2BgscMy7RIZUT5vrVTxJ5fc9VMdosaUGvmYpqD3JohgPLhlIoDTfR%2BxCWpytTxiFIxxtWKqadnvyMrQOIEMnG64yTjh5cGHctX8h; wxuin=1047507352' \
     -H 'Origin: https://channels.weixin.qq.com' \
     -H 'Referer: https://channels.weixin.qq.com/micro/content/playlet/statistic' \
     -H 'Sec-Fetch-Dest: empty' \
