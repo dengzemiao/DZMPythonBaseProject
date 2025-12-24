@@ -3,7 +3,7 @@
 # ========================================
 
 # 标准 HTTP 请求库
-requests>=2.32.0
+# requests>=2.32.0
 
 # 浏览器自动化库（用于登录和捕获接口）
 # 注意：安装后需要在虚拟环境中，手动执行以下命令安装浏览器驱动：
@@ -18,12 +18,12 @@ requests>=2.32.0
 # curl 命令解析库
 # 用途：将浏览器复制的 cURL 命令自动转换为 Python requests 代码
 # 可代替：手动解析 cURL 命令，或使用在线工具（如 curlconverter.com）
-# uncurl>=0.0.11
+uncurl>=0.0.11
 
 # 模拟真实浏览器，绕过反爬
 # 用途：使用 curl_cffi 代替 requests，可以模拟真实浏览器指纹（TLS/HTTP2），绕过反爬虫检测
 # 可代替：requests（当遇到反爬虫时，使用 curl_cffi.requests 代替 requests）
-# curl-cffi>=0.5.0
+curl-cffi>=0.5.0
 
 # 双向转换：requests → curl（调试用）
 # 用途：将 Python requests 代码转换为 cURL 命令，方便调试和分享
