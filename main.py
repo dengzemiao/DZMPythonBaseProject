@@ -23,8 +23,77 @@ curl 命令转换工具 - 快速获取接口数据
 """
 
 import json
+import re
 import uncurl
 from curl_cffi import requests
+
+
+def convert_cookie_format(curl_command: str) -> str:
+    """
+    Cookie 格式转换函数：将 -b 格式转换为 -H 'Cookie:' 格式
+    
+    功能说明：
+        某些 curl 命令使用 -b 或 --cookie 参数传递 Cookie，
+        但 uncurl 库可能无法正确解析，需要转换为标准的 -H 'Cookie:' 格式
+    
+    转换规则：
+        -b 'cookie_value'           → -H 'Cookie: cookie_value'
+        -b "cookie_value"           → -H "Cookie: cookie_value"
+        --cookie 'cookie_value'     → -H 'Cookie: cookie_value'
+        --cookie "cookie_value"     → -H "Cookie: cookie_value"
+        -b'cookie_value'            → -H 'Cookie: cookie_value'
+        --cookie='cookie_value'     → -H 'Cookie: cookie_value'
+    
+    参数说明：
+        curl_command (str): 原始 curl 命令字符串
+    
+    返回值：
+        str: 转换后的 curl 命令字符串
+    
+    使用示例：
+        # 示例 1: 基础使用
+        original = "curl 'http://example.com' -b 'session=abc123'"
+        converted = convert_cookie_format(original)
+        # 结果: "curl 'http://example.com' -H 'Cookie: session=abc123'"
+        
+        # 示例 2: 在 fetch_from_curl 前使用
+        curl_command = '''curl 'http://api.com' -b 'token=xyz' '''
+        curl_command = convert_cookie_format(curl_command)  # 转换格式
+        fetch_from_curl(curl_command, "output.json")        # 发送请求
+    
+    注意事项：
+        - 如果不需要转换，直接注释掉调用这个函数的代码即可
+        - 此函数不会修改已经是 -H 'Cookie:' 格式的命令
+        - 支持单引号和双引号两种格式
+    """
+    
+    # ========================================
+    # 转换逻辑
+    # ========================================
+    
+    # 正则表达式模式说明：
+    # (-b|--cookie)     : 匹配 -b 或 --cookie
+    # \s*               : 匹配 0 或多个空格（处理有无空格的情况）
+    # =?                : 匹配可选的等号（处理 --cookie= 的情况）
+    # \s*               : 匹配 0 或多个空格
+    # (['"])            : 匹配单引号或双引号，并捕获（用于保持原格式）
+    # (.*?)             : 非贪婪匹配任意字符（Cookie 内容）
+    # \2                : 反向引用，匹配与第一个引号相同的结束引号
+    
+    pattern = r'(-b|--cookie)\s*=?\s*([\'\"])(.*?)\2'
+    
+    # 替换函数：将匹配到的内容转换为 -H 'Cookie: xxx' 格式
+    # match.group(2): 引号类型（单引号或双引号）
+    # match.group(3): Cookie 内容
+    def replace_func(match):
+        quote = match.group(2)      # 获取引号类型（保持原格式）
+        cookie_value = match.group(3)  # 获取 Cookie 内容
+        return f"-H {quote}Cookie: {cookie_value}{quote}"
+    
+    # 执行替换
+    converted = re.sub(pattern, replace_func, curl_command)
+    
+    return converted
 
 
 def fetch_from_curl(curl_command: str, output_file: str = "output.json"):
@@ -183,7 +252,7 @@ if __name__ == "__main__":
     # 在这里粘贴你的 curl 命令
     # ========================================
     curl_command = '''
-    curl 'https://channels.weixin.qq.com/micro/content/cgi-bin/mmfinderassistant-bin/component/get-finder-native-drama-statistics-list?_aid=468b5399-796b-4601-b39a-d0cef98ab4fb&_rid=694ba7b7-bc88a4c8&_pageUrl=https:%2F%2Fchannels.weixin.qq.com%2Fmicro%2Fcontent%2Fplaylet%2Fstatistic' \
+    curl 'https://channels.weixin.qq.com/micro/content/cgi-bin/mmfinderassistant-bin/component/get-finder-native-drama-statistics-list?_aid=468b5399-796b-4601-b39a-d0cef98ab4fb&_rid=694bb1d6-569e6852&_pageUrl=https:%2F%2Fchannels.weixin.qq.com%2Fmicro%2Fcontent%2Fplaylet%2Fstatistic' \
     -H 'Accept: */*' \
     -H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8' \
     -H 'Connection: keep-alive' \
@@ -199,8 +268,14 @@ if __name__ == "__main__":
     -H 'sec-ch-ua: "Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"' \
     -H 'sec-ch-ua-mobile: ?0' \
     -H 'sec-ch-ua-platform: "macOS"' \
-    --data-raw '{"pageSize":5,"currentPage":1,"startTs":"1763913600","endTs":"1766419200","queryString":"","timestamp":"1766565815899","_log_finder_uin":"","_log_finder_id":"v2_060000231003b20faec8c4e58110c1d4c703e933b07734b84e170b7efafdfd2e42110c3ee8b0@finder","rawKeyBuff":null,"pluginSessionId":null,"scene":7,"reqScene":7}'
+    --data-raw '{"pageSize":5,"currentPage":1,"startTs":"1763913600","endTs":"1766419200","queryString":"","timestamp":"1766568406685","_log_finder_uin":"","_log_finder_id":"v2_060000231003b20faec8c4e58110c1d4c703e933b07734b84e170b7efafdfd2e42110c3ee8b0@finder","rawKeyBuff":null,"pluginSessionId":null,"scene":7,"reqScene":7}'
     '''
+    
+    # ========================================
+    # 可选步骤：转换 Cookie 格式（如果需要）
+    # ========================================
+    # 如果你的 curl 命令使用了 -b 参数，可以取消下面这行的注释来转换格式
+    # curl_command = convert_cookie_format(curl_command)
     
     # ========================================
     # 执行请求并保存数据
@@ -213,11 +288,16 @@ if __name__ == "__main__":
     # 更多使用示例
     # ========================================
     
-    # 示例 1: 简单的 GET 请求
+    # 示例 1: 转换 Cookie 格式后发送请求
+    # curl_command = '''curl 'https://api.example.com/data' -b 'session=abc123; token=xyz' '''
+    # curl_command = convert_cookie_format(curl_command)  # 转换 -b 为 -H 'Cookie:'
+    # fetch_from_curl(curl_command, "data.json")
+    
+    # 示例 2: 简单的 GET 请求
     # curl_command = '''curl 'https://api.github.com/users/github' '''
     # fetch_from_curl(curl_command, "github_user.json")
     
-    # 示例 2: 带认证的 POST 请求
+    # 示例 3: 带认证的 POST 请求
     # curl_command = '''
     # curl 'https://api.example.com/login' \
     #   -H 'Content-Type: application/json' \
@@ -225,7 +305,7 @@ if __name__ == "__main__":
     # '''
     # fetch_from_curl(curl_command, "login_response.json")
     
-    # 示例 3: 批量请求多个接口
+    # 示例 4: 批量请求多个接口
     # curl_commands = [
     #     ('''curl 'https://api.example.com/user/1' ''', "user1.json"),
     #     ('''curl 'https://api.example.com/user/2' ''', "user2.json"),
