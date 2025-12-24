@@ -18,9 +18,9 @@
 
   * 手动进入虚拟环境：
 
-      `Mac/Liunx`: `$ source venv/Scripts/activate`
+      `Mac/Liunx`: `$ source venv/bin/activate`
 
-      `Winodws`: `$ source venv/bin/activate`
+      `Winodws`: `$ source venv/Scripts/activate`
 
   * 手动生成依赖清单 `$ pip freeze > requirements.txt`
 
